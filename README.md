@@ -219,21 +219,18 @@ npm run dev
 
 ## 🌍 Deployment Guide
 
-### Frontend (Vercel)
-1. Import the repository into Vercel.
-2. Set the Root Directory to `frontend`.
-3. Set the Environment Variable: `VITE_API_URL=https://your-backend-url.onrender.com/api`
-4. Deploy!
+Detailed deployment documentation and history of failures can be found in our comprehensive [DEPLOYMENT.md](file:///c:/Coding%20Academy%20Pro%20free%20cousre/DEPLOYMENT.md) blueprint.
 
-### Backend (Render)
-1. Create a new Web Service on Render.
-2. Set the Build Command: `npm install`
-3. Set the Start Command: `node server.js`
-4. Provide the environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `JWT_SECRET`, `OWNER_EMAIL`, `FRONTEND_URL`).
-5. Deploy!
+### Hosting Stack
+- **Frontend & Backend (Railway):** We host both the React static application and the Node.js API server inside a single **Railway** project. A root-level package configuration orchestrates the build.
+- **Database (TiDB Cloud):** The MySQL database runs on a secure **TiDB Serverless** cluster requiring SSL TLS 1.2 connections.
 
-### Database (MySQL Cloud)
-Host your MySQL database on managed cloud providers like **Aiven, AWS RDS, or PlanetScale**.
+### Quick Deployment Steps
+1. Connect your repository to Railway.
+2. Railway will detect the monorepo structure.
+3. Configure the required environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL=true`, `JWT_SECRET`, `OWNER_EMAIL`).
+4. Ensure the frontend `VITE_API_URL` points to your Railway backend service URL.
+5. Deploy both services seamlessly!
 
 ---
 
