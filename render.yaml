@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: codenest-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: DB_HOST
+        value: gateway01.ap-southeast-1.prod.aws.tidbcloud.com
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_USER
+        value: 3eR9gZj82r1fKiP.root
+      - key: DB_PASSWORD
+        value: xaecQvLcm9TvSlXR
+      - key: DB_NAME
+        value: codenest_free_academy
+      - key: DB_SSL
+        value: "true"
+      - key: JWT_SECRET
+        value: codenest_super_secret_jwt_key_2024
+      - key: OWNER_EMAIL
+        value: anshbhatnagara@gmail.com
+      - key: FRONTEND_URL
+        value: http://localhost:5173 # Fallback, user can update this in Render dashboard once Vercel is live
