@@ -19,14 +19,12 @@ const dbConfig = {
 
 async function migrate() {
   console.log('🔄 Connecting to TiDB Cloud Server...');
-  // Connect without database first
   const connection = await mysql.createConnection(dbConfig);
   
   console.log('🔨 Creating database codenest_free_academy if not exists...');
   await connection.query('CREATE DATABASE IF NOT EXISTS codenest_free_academy;');
   await connection.end();
 
-  // Re-connect to the created database
   console.log('🔄 Connecting to codenest_free_academy...');
   const db = await mysql.createConnection({
     ...dbConfig,
@@ -38,20 +36,30 @@ async function migrate() {
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
 
   console.log('🚀 Running schema queries...');
-  // Split queries by semicolon (making sure not to split inside comments or strings unnecessarily)
-  // Since we know the schema structure, a simple split on ';' followed by newline is safe enough, or using regex.
+  // Split strictly by semicolon
   const schemaQueries = schemaSql
-    .split(/;\s*$/m)
+    .split(';')
     .map(q => q.trim())
-    .filter(q => q.length > 0 && !q.startsWith('--'));
+    .filter(q => q.length > 0);
 
   for (let query of schemaQueries) {
-    if (query.toUpperCase().startsWith('USE')) continue; // Skip USE statements as we are already connected to codenest_free_academy
+    if (query.toUpperCase().startsWith('USE')) continue;
+    // Clean up SQL comments from the query
+    const cleanedQuery = query
+      .split('\n')
+      .filter(line => !line.trim().startsWith('--'))
+      .join('\n')
+      .trim();
+
+    if (cleanedQuery.length === 0) continue;
+
+    console.log(`Executing query: ${cleanedQuery.substring(0, 50)}...`);
     try {
-      await db.query(query);
+      await db.query(cleanedQuery);
     } catch (err) {
-      console.error(`❌ Failed query: ${query.substring(0, 100)}...`);
+      console.error(`❌ Failed query: ${cleanedQuery}`);
       console.error(`Error: ${err.message}`);
+      throw err; // Stop execution on error
     }
   }
   console.log('✅ Schema created successfully!');
@@ -62,17 +70,28 @@ async function migrate() {
 
   console.log('🚀 Running seed queries...');
   const seedQueries = seedSql
-    .split(/;\s*$/m)
+    .split(';')
     .map(q => q.trim())
-    .filter(q => q.length > 0 && !q.startsWith('--'));
+    .filter(q => q.length > 0);
 
   for (let query of seedQueries) {
     if (query.toUpperCase().startsWith('USE')) continue;
+    
+    const cleanedQuery = query
+      .split('\n')
+      .filter(line => !line.trim().startsWith('--'))
+      .join('\n')
+      .trim();
+
+    if (cleanedQuery.length === 0) continue;
+
+    console.log(`Executing seed query: ${cleanedQuery.substring(0, 50)}...`);
     try {
-      await db.query(query);
+      await db.query(cleanedQuery);
     } catch (err) {
-      console.error(`❌ Failed query: ${query.substring(0, 100)}...`);
+      console.error(`❌ Failed seed query: ${cleanedQuery}`);
       console.error(`Error: ${err.message}`);
+      throw err;
     }
   }
   console.log('✅ Seed data inserted successfully!');
