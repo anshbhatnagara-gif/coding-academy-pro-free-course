@@ -222,15 +222,16 @@ npm run dev
 Detailed deployment documentation and history of failures can be found in our comprehensive [DEPLOYMENT.md](file:///c:/Coding%20Academy%20Pro%20free%20cousre/DEPLOYMENT.md) blueprint.
 
 ### Hosting Stack
-- **Frontend & Backend (Railway):** We host both the React static application and the Node.js API server inside a single **Railway** project. A root-level package configuration orchestrates the build.
+- **Frontend (Vercel Hobby):** The React static application is deployed from the `frontend` root directory.
+- **Backend (Render Free):** The Node.js API server is deployed from the `backend` root directory.
 - **Database (TiDB Cloud):** The MySQL database runs on a secure **TiDB Serverless** cluster requiring SSL TLS 1.2 connections.
 
 ### Quick Deployment Steps
-1. Connect your repository to Railway.
-2. Railway will detect the monorepo structure.
-3. Configure the required environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL=true`, `JWT_SECRET`, `OWNER_EMAIL`).
-4. Ensure the frontend `VITE_API_URL` points to your Railway backend service URL.
-5. Deploy both services seamlessly!
+1. Connect the existing repository to Render and Vercel.
+2. Set Render root directory to `backend`, build command to `npm install`, and start command to `npm start`.
+3. Configure the required Render environment variables (`DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL=true`, `JWT_SECRET`, `OWNER_EMAIL`, `FRONTEND_URL`, `CORS_ORIGIN`).
+4. Set Vercel root directory to `frontend`, build command to `npm run build`, output directory to `dist`, and `VITE_API_URL` to the Render backend URL.
+5. Deploy the backend first, then redeploy the frontend, then update final CORS URLs on Render.
 
 ---
 

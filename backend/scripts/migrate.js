@@ -2,33 +2,42 @@ import mysql from 'mysql2/promise';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const dbConfig = {
-  host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
-  port: 4000,
-  user: '3eR9gZj82r1fKiP.root',
-  password: 'xaecQvLcm9TvSlXR',
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '3306', 10),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
   ssl: {
     minVersion: 'TLSv1.2',
     rejectUnauthorized: true
   }
 };
 
+const requiredVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+const missingVars = requiredVars.filter(name => !process.env[name]);
+if (missingVars.length) {
+  throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+}
+
 async function migrate() {
   console.log('🔄 Connecting to TiDB Cloud Server...');
   const connection = await mysql.createConnection(dbConfig);
   
-  console.log('🔨 Creating database codenest_free_academy if not exists...');
-  await connection.query('CREATE DATABASE IF NOT EXISTS codenest_free_academy;');
+  console.log(`🔨 Creating database ${process.env.DB_NAME} if not exists...`);
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
   await connection.end();
 
-  console.log('🔄 Connecting to codenest_free_academy...');
+  console.log(`🔄 Connecting to ${process.env.DB_NAME}...`);
   const db = await mysql.createConnection({
     ...dbConfig,
-    database: 'codenest_free_academy'
+    database: process.env.DB_NAME
   });
 
   console.log('📖 Reading schema.sql...');
